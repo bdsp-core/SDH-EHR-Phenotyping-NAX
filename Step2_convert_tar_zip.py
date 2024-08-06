@@ -6,6 +6,9 @@ import re
 import time
 tqdm.pandas()
 
+
+# here is something to commit
+
 # OPTION THREE TRY TO CONVERT IT INTO A ZIP FILE AND THEN READ THROUGH IT
 def convert_tar_to_zip(tar_path, zip_path):
     while True:
