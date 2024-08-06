@@ -6,6 +6,8 @@ from thunderpack import ThunderReader  # install thunderpack if not yet: pip ins
 import gc
 
 
+# here is a new comment
+
 ##Run the following code to get the sampling cohorts for MGB
 
 reader = ThunderReader('/media/gregory178/Thunderpacks/Dropbox/zz_EHR_Thunderpacks/MGB/thunderpack_icd_9_10_1m_MGB') # read the thunderpack file
@@ -23,7 +25,6 @@ df_icd_plus = df_icd_plus[['BDSPPatientID','ShiftedContactDTS','BDSPEncounterID'
 df_icd_plus.to_csv('patientIDs_ICD_plus_SDH_MGB.csv', index=False)    # save as a CSV file
 
 df_icd_plus = pd.read_csv('patientIDs_ICD_plus_SDH_MGB.csv')
-
 
 # reminder: ICD- group is defined as patients who never got any SDH-related ICDs
 dfs = []
