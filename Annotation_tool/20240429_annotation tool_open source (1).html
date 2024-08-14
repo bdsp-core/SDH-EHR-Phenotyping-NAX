@@ -1,0 +1,1847 @@
+<!doctype html><html><head>
+
+<link rel="stylesheet" type="text/css" href="css.css">
+</head><body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/mark.js/8.6.0/jquery.mark.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.2/package/dist/xlsx.full.min.js"></script>
+  <script src="data.js"></script>
+  <script src="regexes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
+
+  <div id="scroll_top" style="top:45%; left:5px;"><b>↑</b></div>
+  <div id="scroll_anot" style="top:55%; left:5px;"><b>↓</b></div>
+
+  <div class="loading">
+    <div class="loading-spinner"></div>
+  </div>
+
+
+
+  <div id="top_buttons" style="display:none">
+  
+    <b>Choose excel file with notes</b>
+  <input type="file" id="file-input" accept=".xlsx"><br>
+  
+  
+    <button onclick="visualizeDemographics(progress_json, Dem_pt); visualise_conditions(progress_json)">Show graphs for annotated</button>
+    <button id="show-all" onclick='stats_all("xgb");visualizeDemographics(progress_json2, Dem_pt); visualise_conditions(progress_json2)'>Show graphs for all predictions</button>
+    <select onchange="handleSelection(this)">
+      <option value="">Select a prediction type</option>
+      <option value="xgb">XGB</option>
+      <option value="rf">RF</option>
+      <option value="caret">Caret</option>
+      <option value="my_fn">Brain.js</option>
+    </select>
+    <div id="pt_count" class="heading"></div>
+    <div id="plot_conditions"></div>
+    <div id="plot_conditions_rel"></div>
+    <div id="age-chart"></div>
+    <div id="sex-chart"></div>
+    <div id="percent-deceased-chart"></div>
+    <input type="file" id="file-input2" accept=".xlsx"><b>Conditions</b><br>
+    <div id="classifiers"></div><br>
+    <button id="reset_empi_loaded_file1">Reset Empi to loaded file</button>
+    <button id="reset_empi_headache_nidx">Reset Empi to headache and meningits/encephalitis</button>
+    <button id="reset_empi">Reset Empi</button>
+    <div id="classifiers_empi"></div>
+    <textarea id="textbox" style="height:1em"></textarea> 
+    <button id="load">Load previous annotations</button>
+    <button id="headache">headache</button>
+    <button id="testasds">test output</button>
+    <button id="test_next">test next</button>
+    <button id="get_pred">Get predictions</button>
+    <button id="filter_csf_wbc">Filter to CSF WBC in labs</button>
+    <button id="filter_csf">Filter to CSF labs</button>
+    <button id="copy_csv" onclick="jsonToTabs(progress_json)">Copy in csv format</button>
+    <button id="download_csv" onclick="download_csv(progress_json)">Download csv of annotations</button>
+    <br>
+    <input type="checkbox" id="rem_searched" onclick="update_counter()" checked/>Remove after search
+    <input type="checkbox" id="cb1" name="cb1" value="Remove null" checked>
+    <label for="cb1">Remove all values if test result is null</label><br>
+    <input type="checkbox" id="cb2" name="cb2" value="Remove null" checked>
+    <label for="cb2">Remove all null values in filtered</label><br>
+  </div>
+
+  <ul class="tools">
+    <li onclick="save_phrases('pos');">Positive keyword/phrase</li>
+    <li onclick="save_phrases('neg');">Negative keyword/phrase</li>
+	
+    <li onclick="mark_all(10);">Mark all positive</li>
+    <li onclick="mark_all(-10);">Mark all negative</li>
+
+  </ul>
+
+  <div id="empi"></div>
+  <div id="nav">
+    <button id="prev">Prev</button>
+    <input type="range" min="1" max="51" value="1" class="slider" id="myRange">
+    <button id="next">Next</button>
+  </div>
+  <div id="hide_when_reqd">
+    <div id="outputs" style="display:flex">
+      <div id="output_prediction"></div>
+      <div id="output_prediction_xg"></div>
+      <div id="output_prediction_rf"></div>
+      <div id="output_prediction_caret"></div>
+    </div>
+    <div id="main_bg_annot">
+      <div id="output_annotation"></div>
+    </div>
+    <div id="row" class="row">
+    </div>
+
+    <div id="" class="heading">Notes</div>
+    <div id="test_output"></div>
+    <details id="demographics_pre">
+      <summary><div id="" class="heading">Demographics</div></summary>
+      <div id="demographics"></div>
+    </details>
+    <div class="row2">
+      <button class="col2 button" id="Yes">Present</button>
+  <!--    <button class="col2 button" id="Yes_wnv">Present (Due to West Nile Virus)</button> -->
+      <button class="col2 button" id="No">Absent</button>
+      <button class="col2 button" id="Consensus">Send to consensus</button>
+    </div>
+
+    <textarea id="result-div"></textarea>
+    <div id="text_area">
+      <textarea id="Dem">Dem</textarea>
+      <textarea id="Enc">Enc</textarea>
+      <textarea id="Hnp">Hnp</textarea>
+      <textarea id="Lab">Lab</textarea>
+      <textarea id="LNO">LNO</textarea>
+      <textarea id="Med">Med</textarea>
+      <textarea id="Mic">Mic</textarea>
+      <textarea id="OPN">OPN</textarea>
+      <textarea id="Pat">Pat</textarea>
+      <textarea id="Phy">Phy</textarea>
+      <textarea id="Prc">Prc</textarea>
+      <textarea id="Prg">Prg</textarea>
+      <textarea id="Ptd">Ptd</textarea>
+      <textarea id="Pul">Pul</textarea>
+      <textarea id="Rad">Rad</textarea>
+      <textarea id="Rdt">Rdt</textarea>
+      <textarea id="Rfv">Rfv</textarea>
+      <textarea id="Vis">Vis</textarea>
+      <textarea id="Car">Car</textarea>
+      <textarea id="Dia">Dia</textarea>
+      <textarea id="Dis">Dis</textarea>
+    </div>
+    <button id="create">Create file</button>
+    <button id="go">go</button>
+  </div>
+<script type="text/javascript">
+
+const url_login = 'https://annotationtool.arjun2796.workers.dev';
+
+const url_save = 'http://savekeywords.arjun2796.workers.dev';
+//console.log("0 is negative\n1 is positive\n2 is send to consensus\n10 is positive from phrase (batch)\n-10 is negative from phrase (batch)")
+
+console.log("%c0 is negative\n%c1 is positive\n%c2 is send to consensus\n%c10 is positive from phrase (batch)\n%c-10 is negative from phrase (batch)",
+  "color: red", "color: green", "color: yellow", "color: green", "color: red");
+
+// label of what you are annotating
+var current_annotation="NID"
+
+//yes if you want to save phrases on annotating
+var save_marks_on_annotation="ys"
+
+//more than this sent to holdout phrases/keywords
+var holdout_cutoff=400
+
+//yes to use original note/empi, else use index of empi
+var use_empi_cf="yes"
+
+var Dem_pt=[]
+var download_js=0;
+var empi_note="Note: "
+var show_demographics="ys"
+
+var max_times_slider=1000
+
+var sort_empi_according_to_annotations="ys"
+
+
+      var input = document.getElementById('file-input');
+      input.addEventListener('change', function(e) {
+	  console.log("Loading excel file")
+        var file = e.target.files[0];
+        var reader = new FileReader();
+		var loading = document.querySelector('.loading');
+		 loading.style.display = 'flex';
+        reader.onload = function(e) {
+          var data = new Uint8Array(e.target.result);
+          var workbook = XLSX.read(data, {type: 'array'});
+          var sheet = workbook.Sheets[workbook.SheetNames[0]];
+          json = XLSX.utils.sheet_to_json(sheet);
+          console.log(json);
+		  
+		  
+		  
+if (download_js==1){
+var blob = new Blob(['var json =' + JSON.stringify(json)], { type: "application/javascript" });
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+a.href = url;
+a.download = "data.js";
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+
+}
+
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		 // alert("Loaded excel data")
+		 start_uw();
+		 reset_empi_loaded_file1();
+		 loading.style.display = 'none';
+		  //uploaded_excel=json
+		  //changed search_here in line 1310
+		  //search_here=[json]
+		  
+        };
+        reader.readAsArrayBuffer(file);
+      });
+
+
+
+      var input2 = document.getElementById('file-input2');
+      input2.addEventListener('change', function(e) {
+	  console.log("Loading excel file 2")
+        var file = e.target.files[0];
+        var reader = new FileReader();
+		var loading = document.querySelector('.loading');
+		 loading.style.display = 'flex';
+        reader.onload = function(e) {
+          var data = new Uint8Array(e.target.result);
+          var workbook = XLSX.read(data, {type: 'array'});
+          var sheet = workbook.Sheets[workbook.SheetNames[0]];
+          json2 = XLSX.utils.sheet_to_json(sheet);
+          //console.log(json);
+		 // alert("Loaded excel data")
+		 make_checkboxes()
+		// start_uw();
+		 loading.style.display = 'none';
+		  //uploaded_excel=json
+		  //changed search_here in line 1310
+		  //search_here=[json]
+		  
+        };
+        reader.readAsArrayBuffer(file);
+      });
+
+
+
+
+
+function download_csv(json){
+
+
+  var string = JSON.stringify(json);
+//console.log(string)
+var tabString = string.replace(/},{/g, '\n');
+var tabString = tabString.replace(/{".*?":/gmi, '');
+var tabString = tabString.replace(/".*?":/gmi, '');
+var tabString = tabString.replace(/\[/gmi, '');
+var tabString = tabString.replace(/}\]/gmi, '');
+var tabString = tabString.replace(/,/gmi, '\t');
+var tabString="empi\tannot\n"+tabString
+var tabString = tabString.replace(/\t/gmi, ',');
+
+
+
+const blob = new Blob([tabString], { type: "text" });
+const url = URL.createObjectURL(blob);
+const a = document.createElement("a");
+a.href = url;
+//a.download = "data.csv";
+a.download = userName+"_annotations.csv";
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+}
+
+
+
+
+
+
+
+
+function jsonToTabs(json) {
+  var string = JSON.stringify(json);
+//console.log(string)
+var tabString = string.replace(/},{/g, '\n');
+var tabString = tabString.replace(/{".*?":/gmi, '');
+var tabString = tabString.replace(/".*?":/gmi, '');
+var tabString = tabString.replace(/\[/gmi, '');
+var tabString = tabString.replace(/}\]/gmi, '');
+var tabString = tabString.replace(/,/gmi, '\t');
+var tabString="empi\tannot\n"+tabString
+
+  var textArea = document.createElement('textarea');
+  textArea.value = tabString;
+//console.log(tabString)
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textArea);
+}
+
+
+
+
+function reset_empi(){
+	
+	 empi = json2.map(item => item.EMPI);
+	 document.querySelector("#classifiers_empi").innerHTML="Filtered EMPIs: "+empi.length
+	 start_uw()
+	 }
+function reset_empi_loaded_file1(){
+
+	 empi = json.map(item => item.EMPI);
+	 document.querySelector("#classifiers_empi").innerHTML="Filtered EMPIs: "+empi.length
+	 start_uw()
+	 }
+	 
+function reset_empi_loaded_file2(){
+
+	 empi = json.map(item => item.EMPI);
+	 document.querySelector("#classifiers_empi").innerHTML="Filtered EMPIs: "+empi.length
+	 //start_uw()
+	 }
+function reset_empi_headache_nidx(){
+	
+	 empi = empi_headache;
+	 document.querySelector("#classifiers_empi").innerHTML="Filtered EMPIs: "+empi.length
+	 start_uw()
+	 }
+
+function make_checkboxes(){
+	
+ empi_all = json2.map(item => item.EMPI);
+ empi = json2.map(item => item.EMPI);
+
+Object.keys(json2[0]).forEach(function(key) {
+  if (json2[0][key] == 0 || json2[0][key] == 1) {
+    var checkboxx = document.createElement('input');
+    checkboxx.type = 'checkbox';
+	
+//	(div_text.replace((RegExp(`', '`, "gi")), ('<br><br><hr><br>')))
+    checkboxx.name = key.replace(('_enc'),(''));
+    checkboxx.value = key.replace(('_enc'),(''));
+    checkboxx.onchange = function() {
+		//console.log(empi.length)
+      if (this.checked) {
+	  
+	  
+        json2.forEach(function(obj) {
+          if (obj[key] == 0) {
+		/*	  
+            let index = empi.indexOf(obj.EMPI)
+			//console.log(empi_all[index])
+			//if (index !== -1){empi.splice(index, 1);}
+let index2=empi.indexOf(empi_all[index])
+//console.log(index2)
+empi.splice(index2, 1);
+*/
+				
+			//	empi.splice(index, 1);
+			
+			
+			
+			let index = empi.indexOf(obj.EMPI)
+if (index !== -1) {
+  empi.splice(index, 1);
+}
+			
+			
+			
+			
+			
+			
+			
+            
+          }
+        $('#myRange').attr('max', empi.length);});
+		
+      }
+	  else if (!this.checked) {
+	 console.log(this.value)
+	  
+ //       json2.forEach(function(obj) {
+ //         if (obj[key] == 1) {
+ //           let index = empi.indexOf(obj.empi)
+ //           empi.splice(index, 1);
+ //         }
+ //       });
+     empi = json2.map(item => item.EMPI);
+     var checkboxes = document.querySelectorAll('#classifiers input[type="checkbox"]');
+    
+    // Loop through all checkboxes
+    for (var i = 0; i < checkboxes.length; i++) {
+      // If a checkbox is checked, fire the onchange function
+      if (checkboxes[i].checked) {
+    	 // alert(checkboxes[i].value)
+        checkboxes[i].onchange();
+    	
+      }
+    }
+		
+		
+      }
+	  //console.log(empi.length)
+	  document.querySelector("#reset_empi").innerHTML="Filtered EMPIs: "+empi.length
+$('#myRange').attr('max', empi.length);
+    };
+	
+classifiers=document.getElementById("classifiers")
+    classifiers.appendChild(checkboxx);
+classifiers.appendChild(document.createTextNode(key.replace(('_enc'),(''))));
+  }
+})
+}
+
+
+
+
+
+var search_auto="yes"
+var remove_null="yes"
+var remove_null_result="yes"
+
+//var search_hlight="yes"
+
+reset_empi_headache_nidx
+$("#reset_empi_headache_nidx").click(function() {
+reset_empi_headache_nidx()
+})
+$("#reset_empi_loaded_file1").click(function() {
+reset_empi_loaded_file1()
+})
+
+
+$("#headache").click(function() {
+headache()
+})
+$("#load").click(function() {
+load_prev_annot()
+})
+
+
+
+// Reset EMPI on click
+$("#reset_empi").click(function() {
+    reset_empi();
+});
+
+// Scroll to top on click
+$("#scroll_top").click(function() {
+    scroll_to_top();
+});
+
+// Scroll to top function
+function scroll_to_top() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+// Scroll to bottom
+$("#scroll_anot").click(function() {
+    scroll_to_anot();
+});
+
+// Scroll to bottom function
+function scroll_to_anot() {
+    // Get the next mark element
+    var nextMark = document.getElementById("Yes");
+    
+    // Scroll to the next mark element smoothly
+    nextMark.scrollIntoView({ behavior: "smooth" });
+}
+
+// Event bindings for button clicks
+$("#Yes").on('click', function() {
+    annotate(1);
+});
+
+$("#Yes_wnv").on('click', function() {
+    annotate(11);
+});
+
+$("#No").on('click', function() {
+    annotate(0);
+});
+
+$("#Consensus").on('click', function() {
+    annotate(2);
+});
+
+// Event binding for key presses
+document.body.addEventListener("keydown", function(event) {
+    const KEY_CODES = {
+        83: scroll_to_anot,  // S key
+        87: scroll_to_top,  // W key
+        65: function() {    // A key
+            change_empi(-1);
+            scroll_to_top();
+        },
+        68: function() {    // D key
+            change_empi(1);
+            scroll_to_top();
+        }
+    };
+
+    if (KEY_CODES[event.keyCode]) {
+        KEY_CODES[event.keyCode]();
+    }
+});
+
+
+
+
+
+
+function headache(){
+$('#myRange').attr('max', empi.length);
+var phraseLength = 100;
+var foundSentences = [];
+textareas = Array.from(document.querySelectorAll('#text_area textarea'));
+textareaValuesString = textareas.map(textarea => textarea.value).join(' ');
+var text=textareaValuesString
+headache_pos_neg(text)
+asdsdaws=foundSentences
+}
+
+
+
+var progress2=''
+
+
+
+
+function load_prev_annot(){
+progress_json=[]
+	var input = document.getElementById('textbox').value
+	document.getElementById('textbox').value=""
+var s_codes= input.split('\n');
+progress_json=convertArray(s_codes)
+console.log(progress_json)
+slider.value = progress_json.length
+start_uw()
+}
+
+
+function convertArray(arr) {
+  let progress_json = [];
+  for (let i = 0; i < arr.length; i++) {
+    let el = arr[i].split('\t');
+    let obj = {
+      "current_empi": parseFloat(el[0]),
+      "val": parseFloat(el[1])
+    };
+	if(el[0].length>7){
+    progress_json.push(obj);}
+  }
+  return progress_json;
+}
+
+function addNewlineBeforeDate(div_text) {
+  let regex = /\(?\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/g;
+  return div_text.replace(regex, "\n$&");
+}
+
+
+//highlight fn
+
+function headache_pos_neg(div_text) {
+  // Add <hr> between 2 notes
+  div_text = div_text.replace(RegExp(`', '`, "gi"), '<br><br><hr><br>');
+
+  // Replace new lines with space
+  div_text = div_text.replace(/\\n/g, ' ');
+  div_text = addNewlineBeforeDate(div_text);
+
+  // Clear the inner HTML of all elements with class 'col'
+  let cols = document.querySelectorAll('.col');
+  cols.forEach(col => {
+    col.innerHTML = '';
+  });
+
+  // Set the inner HTML of the element with id 'test_output' to div_text
+  document.querySelector("#test_output").innerHTML = div_text;
+
+  // Make search case-insensitive
+  div_text = div_text.toLowerCase();
+
+  // Replace multiple spaces with a single space
+  div_text = div_text.replace(/\s+/g, ' ');
+
+  // Create a new Hilitor object for the element with id 'test_output2323'
+  var myHilitor = new Hilitor("test_output2323");
+
+  // Highlight text using regexes
+  highlightText(regexes);
+
+  // Merge consecutive marks
+  mergeConsecutiveMarks();
+
+  // Add click events to go to next highlight
+  Object.entries(regexes).forEach(([key, regexArr], index) => {
+    var className = "class_" + key;
+    scrollToNextMark(className);
+  });
+
+  // Add tooltip to elements matching the given selector within the element with id 'test_output'
+  addTooltip("div.col:nth-child(n) > li:nth-child(n)", "#test_output");
+
+  // Separate notes
+  var testOutput = document.getElementById('test_output');
+  var hrTags = testOutput.getElementsByTagName('hr');
+  var hrTagCount = hrTags.length + 1;
+  var hrTagCountDiv = document.createElement('div');
+  
+  // Add a horizontal rule to hrTagCountDiv
+  hrTagCountDiv.innerHTML = '<hr>';
+  
+  // Insert hrTagCountDiv before the first child of testOutput
+  testOutput.insertBefore(hrTagCountDiv, testOutput.firstChild);
+  
+  // Separate notes with a count and buttons to quickly navigate between them
+  for (var i = hrTagCount -1; i >=0; i--) {
+    var hrTagButton = document.createElement('button');
+    hrTagButton.innerHTML = i +1;
+    hrTagButton.onclick = function() {
+      hrTags[this.innerHTML -1].scrollIntoView({ behavior: "smooth" });
+    };
+    testOutput.insertBefore(hrTagButton, testOutput.firstChild);
+   }
+}
+
+
+
+
+
+// This function merges consecutive marks with the same class name
+function mergeConsecutiveMarks() {
+  // Get the test output element
+  var testOutput = document.getElementById("test_output");
+  // Get all mark elements within the test output element
+  var marks = testOutput.getElementsByTagName("mark");
+  var i = 0;
+
+  // Loop through all marks except the last two
+  while (i < marks.length - 2) {
+    // Get the current and next mark elements
+    var currentMark = marks[i];
+    var nextMark = marks[i + 1];
+    // Get the element between the current and next mark elements
+    var inbetween = currentMark.nextSibling;
+
+    // If the current and next mark elements have the same class name, and there is no text between them
+    if (currentMark.className === nextMark.className && inbetween.textContent.trim() === '' && inbetween.nextSibling.className === currentMark.className) {
+      // Merge the inner HTML of the next mark element into the current mark element
+      currentMark.innerHTML += ' ' + nextMark.innerHTML;
+      // Remove the next mark element from the test output element
+      testOutput.removeChild(nextMark);
+    } else {
+      // Increment the index
+      i++;
+    }
+  }
+}
+
+// This function searches for text within mark elements and scrolls to it
+function searchText() {
+  // Get the text content of the clicked list item
+  const textContent = this.childNodes[0].textContent;
+  
+  // Get all mark elements on the page
+  const searchTexts = document.querySelectorAll('mark');
+  
+  // Loop through all mark elements
+  searchTexts.forEach(searchText => {
+    // If the text content of the mark element matches the text content of the clicked list item (case-insensitive)
+    if (searchText.textContent.toLowerCase() === textContent.toLowerCase()) {
+      // Scroll to the mark element smoothly
+      searchText.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+}
+
+
+
+
+function addTooltip(selector, testOutputSelector) {
+  const elements = document.querySelectorAll(selector);
+  const testOutput = document.querySelector(testOutputSelector);
+
+  elements.forEach(element => {
+    element.addEventListener("mouseover", function() {
+      let textContent = element.textContent;
+      textContent = textContent.replace((RegExp(`\\(`, "gi")), ('\\\('))
+        .replace((RegExp(`\\)`, "gi")), ('\\\)'))
+        .replace((RegExp(`\\/`, "gi")), ('\\\/'))
+        .replace((RegExp(`\\"`, "gi")), ('\\\"'))
+        .replace((RegExp(`\\'`, "gi")), ('\\\''))
+        .replace((RegExp(`\\*`, "gi")), ('\\\*'))
+        .replace((RegExp(`\\+`, "gi")), ('\\\+')); 
+
+      let matches = testOutput.textContent.match(new RegExp(`(?<=\\b).{0,50}${textContent}.{0,50}(?=\\b)`, "gim"));
+  
+      let tooltip = document.createElement("div");
+      tooltip.classList.add("tooltiptext2");
+      tooltip.setAttribute('id','tooltip');
+  
+      tooltip.innerHTML = matches.join("...<hr>...");
+      tooltip.innerHTML ="..."+tooltip.innerHTML+"...";
+  
+      element.appendChild(tooltip);
+      if (tooltip.offsetLeft>(window.innerWidth/2)){
+        tooltip.style.left = (window.innerWidth/2) + "px";
+      }
+  
+      var myHilitor2 = new Hilitor("tooltip"); 
+      myHilitor2.setMatchType("left");
+      myHilitor2.setBreakRegExp(new RegExp('[^\\w\'(), -]+', "gim")); 
+      if (textContent.length>1){
+        myHilitor2.apply(textContent);
+      }
+    });
+
+    element.addEventListener("mouseout", function() {
+      element.removeChild(element.lastChild);
+    });
+  });
+}
+
+function highlightText(regexes) {
+  var counters = {};
+
+  // Use Object.entries to loop over the object
+  Object.entries(regexes).forEach(([key, regexArr], index) => {
+    var className = "class_" + key;
+    var counter = 0;
+
+    for (let i = 0; i < regexArr.length; i++) {
+      let phrase = regexArr[i];
+
+      $("#test_output").markRegExp(phrase, {
+        "acrossElements": true,
+        "className": className,
+        "done": function(count) {
+          counter += count;
+        }
+      });
+    }
+
+    counters[key] = counter;
+  });
+
+  // Call populateStats function for each regex
+  Object.entries(regexes).forEach(([key, regexArr], index) => {
+    populateStats("class_" + key, counters[key]);
+  });
+}
+
+function populateStats(selector, counter) {
+  var spanElements = document.querySelectorAll("mark." + selector);
+  var spanTexts = [];
+
+  for (let mark of spanElements) {
+      spanTexts.push(mark.innerText.toLowerCase());
+  }
+//console.log(spanTexts)
+  var uniqueSpanTexts = [...new Set(spanTexts)];
+
+  var parent = $("div.col." + selector);
+  parent.html("")
+  $.each(uniqueSpanTexts, function() {
+      $("<li></li>").html(this).appendTo(parent);
+  });
+
+  parent.prepend("Total matches: " + counter + ",\tUnique: " + uniqueSpanTexts.length);
+}
+
+
+//highlightText(regexes);
+
+
+
+
+
+
+
+
+
+
+var progress=""
+progress_json=[]
+function annotate(val) {
+  var textarea = document.createElement('textarea');
+  progress_json.push({current_empi,val})
+//  progress=progress+"\n"+ current_empi+'\t'+val;
+  progress=progress+ current_empi+'\t'+val+"\n";
+  textarea.value =progress;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+ // window.scrollTo(0, 0,{ behavior: "smooth" })
+  
+    window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+  if (use_empi_cf!="yes"){
+progress_json_changed=changeEmpi(progress_json)}
+  else {
+	  
+	  progress_json_changed=progress_json
+  }
+  
+  progress_json_changed = progress_json_changed.reduce((acc, obj) => {
+  const idx = acc.findIndex(item => item.current_empi === obj.current_empi);
+  if (idx !== -1) {
+    acc[idx] = obj;
+  } else {
+    acc.push(obj);
+  }
+  return acc;
+}, []);
+
+  progress_json=progress_json_changed
+  
+  save_annotations()
+  
+console.log(progress_json)
+  change_empi(1)
+  
+
+};
+
+
+
+
+$("#next").click(function() {
+change_empi(1)
+})
+$("#prev").click(function() {
+change_empi(-1)
+})
+
+function change_empi(i){
+
+asdsdsd5t = parseInt(myRange.value)
+
+asdsdsd5t=asdsdsd5t+i
+slider.value = asdsdsd5t
+start_uw()
+}
+
+
+function createDivById(jsonData, id) {
+  // Parse the JSON data
+  let data = jsonData
+
+  // Find object by id
+  let obj;
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].EMPI === id) {
+      obj = data[i];
+      break;
+    }
+  }
+
+  // Create div for the object
+  if (obj) {
+    let demographicsDiv = document.getElementById("demographics");
+    let objDiv = document.createElement("div");
+    let objKeys = Object.keys(obj);
+    for (let i = 0; i < objKeys.length; i++) {
+      let key = objKeys[i];
+      let propDiv = document.createElement("div");
+      propDiv.innerHTML = `${key}: ${obj[key]}`;
+      objDiv.appendChild(propDiv);
+    }
+    demographicsDiv.appendChild(objDiv);
+  }
+}
+
+
+
+
+
+function start_uw() {
+//  console.log("start_uw")
+     let input = document.getElementById('textbox').value
+	  input = input.toLowerCase(); 
+  asdsdsd5t = parseInt(myRange.value)
+current_empi = empi[asdsdsd5t-1]
+  $('#Dem').val('');
+  $('#Enc').val('');
+  $('#Hnp').val('');
+  $('#Lab').val('');
+  $('#LNO').val('');
+  $('#Med').val('');
+  $('#Mic').val('');
+  $('#OPN').val('');
+  $('#Pat').val('');
+  $('#Phy').val('');
+  $('#Prc').val('');
+  $('#Prg').val('');
+  $('#Ptd').val('');
+  $('#Pul').val('');
+  $('#Rad').val('');
+  $('#Rdt').val('');
+  $('#Rfv').val('');
+  $('#Vis').val('');
+  $('#Car').val('');
+  $('#Dia').val('');
+  $('#Dis').val('');
+document.getElementById("demographics").innerHTML=""
+document.getElementById("empi").innerHTML = empi_note + current_empi + " ("+ asdsdsd5t+"/" + empi.length+")"
+  
+  
+
+document.getElementById("output_annotation").innerHTML ="Not yet annotated"
+
+document.getElementById("main_bg_annot").style.backgroundColor = "#1e10c808";
+
+//console.log(progress_json)
+var index = progress_json.findIndex(function(item, i) {
+  return item.current_empi === current_empi;
+});
+
+if (index > -1) {
+  var outputAnnotation = document.getElementById("output_annotation");
+  var annotationValue = progress_json[index].val;
+  divText = "Not yet annotated";
+
+  if (annotationValue == "1") {
+    divText = "Previous annotation: " + current_annotation + " present";
+    document.getElementById("main_bg_annot").style.backgroundColor = "#0c730c42";
+  } else if (annotationValue == "11") {
+    divText = "Previous annotation: " + current_annotation + " present (West Nile Virus)";
+    document.getElementById("main_bg_annot").style.backgroundColor = "#0c730c42";
+  } else if (annotationValue == "10") {
+    divText = "Previous annotation: " + current_annotation + " present (from phrase)";
+    document.getElementById("main_bg_annot").style.backgroundColor = "#0c730c42";
+  } else if (annotationValue == "0") {
+    divText = "Previous annotation: " + current_annotation + " absent";
+    document.getElementById("main_bg_annot").style.backgroundColor = "rgba(205, 42, 42, 0.49)";
+  } else if (annotationValue == "-10") {
+    divText = "Previous annotation: " + current_annotation + " absent (from phrase)";
+    document.getElementById("main_bg_annot").style.backgroundColor = "rgba(205, 42, 42, 0.49)";
+  } else if (annotationValue == "2") {
+    divText = "Previous annotation: Sent for consensus";
+    document.getElementById("main_bg_annot").style.backgroundColor = "yellow";
+  }
+
+  outputAnnotation.innerHTML = divText;
+}
+
+
+
+search_here=[json]
+
+
+if (show_demographics=="yes"){
+createDivById(Dem_pt,current_empi)
+}
+
+for (let j=0; j<search_here.length; j++){
+for (let i=0; i<search_here[j].length; i++){
+	  l=j+1
+
+	 // curr_val=$('#Dem').val()
+curr_val=document.querySelector("#text_area > textarea:nth-child(" + l + ")").value
+if (current_empi==search_here[j][i]['EMPI']){
+//	console.log(JSON.stringify(Dem[i]))
+//	  $('#Dem').val(curr_val+Dem[i]['Report_Text ']);
+//trying to show all values
+
+searchedterm=JSON.stringify(search_here[j][i], null, '\t')
+lowercasefirst=searchedterm.toLowerCase()
+
+if(input.length>2 && search_auto=="yes"){
+
+if (lowercasefirst.includes(input)) {
+//console.log(searchedterm)
+document.querySelector("#text_area > textarea:nth-child(" + l + ")").value=(curr_val+searchedterm);
+document.querySelector("#text_area > textarea:nth-child(" + l + ")").style.display='inline-block'
+}
+
+else{
+document.querySelector("#text_area > textarea:nth-child(" + l + ")").style.display='none'
+}
+
+}
+else{
+document.querySelector("#text_area > textarea:nth-child(" + l + ")").value=(curr_val+searchedterm);
+
+}
+
+}
+}
+}
+
+
+
+
+
+headache()
+
+
+}
+  
+  
+function scrollToNextMark(className) {
+  // Get all elements with the specified class
+  const marks = document.getElementsByClassName(className);
+  
+  // Loop through all elements with the class
+ 
+  for (let i = 0; i < marks.length; i++) {
+    // Attach a click event listener to each element
+    marks[i].addEventListener("click", function() {
+      // Get the next element with the same class
+      var nextMark = marks[i + 1];
+      if (i==marks.length-1){
+	  var nextMark=marks[0]
+	  }
+      // Check if the next element exists
+      if (nextMark) {
+        // Scroll to the next element
+        nextMark.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+  }
+}
+
+  
+  
+  
+
+//var JSLink = "_Dem.js"
+
+
+/*
+var JSLink = "data22.js"
+//var JSLink = "nokey.js"
+    var JSElement = document.createElement('script');
+    JSElement.src = JSLink;
+    document.getElementsByTagName('head')[0].appendChild(JSElement);
+*/
+//empii is empis with meningits 1 from merged_file2.xlsx
+
+var empii=[]
+//empi is empii filtered to headache
+empi_headache=[]
+empi=empi_headache
+//console.log(empi)
+
+
+
+  $('#myRange').attr('max', empi.length);
+
+  var slider = document.getElementById("myRange");
+
+//  slider.oninput = function () { start_uw() }
+
+let timer;
+slider.oninput = function () {
+  clearTimeout(timer);
+  timer = setTimeout(start_uw(), max_times_slider);
+}
+
+  slider.value = 1
+
+
+
+
+
+
+var newarray=[]
+
+  var gooo = document.getElementById('go')
+
+  gooo.addEventListener('click', function () {
+  
+  
+
+for (let i=0; i<json.length; i++){
+
+for (let j=0; j<mrns.length; j++){
+if (mrns[j]==json[i]['MRN']){
+newarray[j]=newarray[j]+(json[i]['MRN']+json[i]['Report_Text '])
+newarray[j]["MRN"]=json[i]['MRN']
+break
+}
+//
+
+}
+
+if(i==(json.length-1)){
+console.log(newarray)
+bling=newarray
+//downloadObjectAsJson(bling,"sddsfsdf")
+downloadObjectAsJson(newarray,"sddsfsdf")
+}
+
+}
+
+
+
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function Hilitor(id, tag)
+{
+
+  // private variables
+  var targetNode = document.getElementById(id) || document.body;
+  var hiliteTag = tag || "MARK";
+  var skipTags = new RegExp("^(?:" + hiliteTag + "|SCRIPT|FORM|SPAN)$");
+  var colors = ["#ff6", "#a0ffff", "#9f9", "#f99", "#f6f"];
+  var wordColor = [];
+  var colorIdx = 0;
+  var matchRegExp = "";
+  var openLeft = false;
+  var openRight = false;
+
+  // characters to strip from start and end of the input string
+  var endRegExp = new RegExp('^[^\\w]+|[^\\w]+$', "g");
+
+  // characters used to break up the input string into words
+  var breakRegExp = new RegExp('[^\\w\'-]+', "g");
+
+  this.setEndRegExp = function(regex) {
+    endRegExp = regex;
+    return endRegExp;
+  };
+
+  this.setBreakRegExp = function(regex) {
+    breakRegExp = regex;
+    return breakRegExp;
+  };
+
+  this.setMatchType = function(type)
+  {
+    switch(type)
+    {
+      case "left":
+        this.openLeft = false;
+        this.openRight = true;
+        break;
+
+      case "right":
+        this.openLeft = true;
+        this.openRight = false;
+        break;
+
+      case "open":
+        this.openLeft = this.openRight = true;
+        break;
+
+      default:
+        this.openLeft = this.openRight = false;
+
+    }
+  };
+
+  this.setRegex = function(input)
+  {
+    input = input.replace(endRegExp, "");
+    input = input.replace(breakRegExp, "|");
+    input = input.replace(/^\||\|$/g, "");
+	
+	
+	
+	//changed regex pattern, on 24/4/2023
+    input = input.replace(/\(/g, "\\\(");
+    input = input.replace(/\)/g, "\\\)");
+    if(input) {
+      var re = "(" + input + ")";
+      if(!this.openLeft) {
+        re = "\\b" + re;
+      }
+      if(!this.openRight) {
+        re = re + "\\b";
+      }
+      matchRegExp = new RegExp(re, "i");
+      return matchRegExp;
+    }
+    return false;
+  };
+
+  this.getRegex = function()
+  {
+    var retval = matchRegExp.toString();
+    retval = retval.replace(/(^\/(\\b)?|\(|\)|(\\b)?\/i$)/g, "");
+    retval = retval.replace(/\|/g, " ");
+    return retval;
+  };
+
+  // recursively apply word highlighting
+  this.hiliteWords = function(node)
+  {
+    if(node === undefined || !node) return;
+    if(!matchRegExp) return;
+    if(skipTags.test(node.nodeName)) return;
+
+    if(node.hasChildNodes()) {
+      for(var i=0; i < node.childNodes.length; i++)
+        this.hiliteWords(node.childNodes[i]);
+    }
+    if(node.nodeType == 3) { // NODE_TEXT
+
+      var nv, regs;
+
+      if((nv = node.nodeValue) && (regs = matchRegExp.exec(nv))) {
+
+        if(!wordColor[regs[0].toLowerCase()]) {
+          wordColor[regs[0].toLowerCase()] = colors[colorIdx++ % colors.length];
+        }
+
+        var match = document.createElement(hiliteTag);
+        match.appendChild(document.createTextNode(regs[0]));
+        match.style.backgroundColor = wordColor[regs[0].toLowerCase()];
+        match.style.color = "#000";
+
+        var after = node.splitText(regs.index);
+        after.nodeValue = after.nodeValue.substring(regs[0].length);
+        node.parentNode.insertBefore(match, after);
+
+      }
+    }
+  };
+
+  // remove highlighting
+  this.remove = function()
+  {
+/*
+    var arr = document.getElementsByTagName(hiliteTag), el;
+    while(arr.length && (el = arr[0])) {
+      var parent = el.parentNode;
+      parent.replaceChild(el.firstChild, el);
+      parent.normalize();
+    }
+*/
+  };
+
+  // start highlighting at target node
+  this.apply = function(input)
+  {
+    this.remove();
+    if(input === undefined || !(input = input.replace(/(^\s+|\s+$)/g, ""))) {
+      return;
+    }
+    if(this.setRegex(input)) {
+      this.hiliteWords(targetNode);
+    }
+    return matchRegExp;
+  };
+
+}
+
+
+
+
+async function get_annotations() {
+reset_empi_loaded_file2()
+  const data = [userName,password];
+  const response = await fetch(url_login, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+   result = await response.json();
+console.log(result)
+  
+if (result[0]=="Incorrect password"){
+	empi=[]
+	alert ("Incorrect password")
+	return empi
+}
+  
+  
+else{
+
+progress_json=result['originaldata']
+if (progress_json === null) {
+  progress_json = [];
+}
+
+if (use_empi_cf!="yes"){
+restoreEmpi(progress_json)}
+
+
+empi=empi.splice(result['saved_data_1'],result['saved_data_2'])
+//empi=[1,2,3]
+if (sort_empi_according_to_annotations=="yes"){
+sort_empi_annotated_first()}
+$('#myRange').attr('max', empi.length)
+slider.value = progress_json.length
+start_uw()
+
+
+ // const result = await response;
+ console.log(progress_json)
+return progress_json;
+
+}
+//start_uw()
+}
+
+
+async function save_annotations() {
+	
+if (save_marks_on_annotation=="yes"){
+	 await processMarkSets()
+	
+}
+ // const data = [userName,progress_json_changed];
+  const data = [userName,password,progress_json_changed];
+  const response = await fetch(url_login, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+}
+
+
+
+
+//replaces current empi with index of empi
+function changeEmpi(arr) {
+  return arr.map(obj => {
+    const index = empi.findIndex(item => item === obj.current_empi);
+    return {
+      ...obj,
+      current_empi: index
+    };
+  });
+}
+
+
+
+
+
+function restoreEmpi(arr) {
+	if (arr==null){
+		
+		progress_json=[]
+	}
+	if (arr!=null){
+  arr.forEach(obj => {
+    obj.current_empi = empi[obj.current_empi];
+	});}
+}
+
+
+
+
+
+function getUserInput(promptMessage) {
+  let inputElement = document.createElement('input');
+  inputElement.type = 'text';
+  inputElement.style.marginBottom = '10px';
+  inputElement.style.fontSize = '25px';
+  let modalContent = document.createElement('div');
+  modalContent.appendChild(document.createTextNode(promptMessage));
+  modalContent.appendChild(document.createElement('hr'));
+  modalContent.appendChild(document.createElement('br'));
+  modalContent.appendChild(document.createElement('br'));
+  modalContent.appendChild(inputElement);
+  let userInput = null;
+  let modal = document.createElement('dialog');
+  modal.classList.add('modal');
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+  modal.showModal();
+  inputElement.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      modal.close();
+    }
+  });
+  modal.addEventListener('close', function() {
+    userInput = inputElement.value.trim() || null;
+    modal.remove();
+  });
+  return new Promise(function(resolve, reject) {
+    modal.addEventListener('close', function() {
+      if (userInput === null) {
+        reject('User cancelled the prompt');
+      } else {
+        resolve(userInput);
+      }
+    });
+  });
+}
+
+getUserInput('Enter your username').then(function(selectedUser) {
+   userName = selectedUser.toLowerCase();
+   password = prompt('Enter password');
+  get_annotations();
+}).catch(function(error) {
+  alert(error);
+});
+
+
+
+
+
+function add_user(...data) {
+
+  fetch(url_login, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Error: ' + response.status);
+      }
+    })
+    .then(responseData => {
+      console.log('PATCH request successful:', responseData);
+      // Do something with the response data
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
+
+// Example usage:
+//add_user("username", "password", "start_index", "number_of_notes");
+
+
+//created by Dr Arjun Singh, arjun2796@gmail.com
+
+
+
+
+
+
+
+function pollFunction1() {
+  if (empi.length ==0) {
+    setTimeout(pollFunction1, 100); // Check again after 100 milliseconds
+	console.log("no")
+  } else {
+  
+  
+  
+  midpoint = Math.ceil(json.length / 2);
+
+// Extract the first half values of EMPI
+ pos = json.slice(0, midpoint).map(data => data.EMPI);
+
+// Extract the second half values of EMPI
+ neg = json.slice(midpoint).map(data => data.EMPI);
+  
+  
+
+  empi = randomizeArrays(pos, neg);
+
+    console.log("yes"); // Fire function2 when function1 finishes
+  }
+}
+pollFunction1()
+
+
+function randomizeArrays(arr1, arr2) {
+  // Combine all the arrays into a single array
+  const combinedArray = arr1.concat(arr2);
+
+  // Set the seed value for the random number generator
+  Math.seedrandom('mySeed');
+
+  // Randomize the sequence of the combined array
+  const randomizedArray = [];
+  while (combinedArray.length > 0) {
+    const randomIndex = Math.floor(Math.random() * combinedArray.length);
+    const element = combinedArray.splice(randomIndex, 1)[0];
+    randomizedArray.push(element);
+  }
+console.log(randomizedArray);
+  return randomizedArray;
+}
+
+
+//seedrandom
+!function(f,a,c){var s,l=256,p="random",d=c.pow(l,6),g=c.pow(2,52),y=2*g,h=l-1;function n(n,t,r){function e(){for(var n=u.g(6),t=d,r=0;n<g;)n=(n+r)*l,t*=l,r=u.g(1);for(;y<=n;)n/=2,t/=2,r>>>=1;return(n+r)/t}var o=[],i=j(function n(t,r){var e,o=[],i=typeof t;if(r&&"object"==i)for(e in t)try{o.push(n(t[e],r-1))}catch(n){}return o.length?o:"string"==i?t:t+"\0"}((t=1==t?{entropy:!0}:t||{}).entropy?[n,S(a)]:null==n?function(){try{var n;return s&&(n=s.randomBytes)?n=n(l):(n=new Uint8Array(l),(f.crypto||f.msCrypto).getRandomValues(n)),S(n)}catch(n){var t=f.navigator,r=t&&t.plugins;return[+new Date,f,r,f.screen,S(a)]}}():n,3),o),u=new m(o);return e.int32=function(){return 0|u.g(4)},e.quick=function(){return u.g(4)/4294967296},e.double=e,j(S(u.S),a),(t.pass||r||function(n,t,r,e){return e&&(e.S&&v(e,u),n.state=function(){return v(u,{})}),r?(c[p]=n,t):n})(e,i,"global"in t?t.global:this==c,t.state)}function m(n){var t,r=n.length,u=this,e=0,o=u.i=u.j=0,i=u.S=[];for(r||(n=[r++]);e<l;)i[e]=e++;for(e=0;e<l;e++)i[e]=i[o=h&o+n[e%r]+(t=i[e])],i[o]=t;(u.g=function(n){for(var t,r=0,e=u.i,o=u.j,i=u.S;n--;)t=i[e=h&e+1],r=r*l+i[h&(i[e]=i[o=h&o+t])+(i[o]=t)];return u.i=e,u.j=o,r})(l)}function v(n,t){return t.i=n.i,t.j=n.j,t.S=n.S.slice(),t}function j(n,t){for(var r,e=n+"",o=0;o<e.length;)t[h&o]=h&(r^=19*t[h&o])+e.charCodeAt(o++);return S(t)}function S(n){return String.fromCharCode.apply(0,n)}if(j(c.random(),a),"object"==typeof module&&module.exports){module.exports=n;try{s=require("crypto")}catch(n){}}else"function"==typeof define&&define.amd?define(function(){return n}):c["seed"+p]=n}("undefined"!=typeof self?self:this,[],Math);
+
+
+
+
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+  async function fireFunctions() {
+  const users = [
+    { username: "1", password: "pass", start: "0", limit: "400" },
+    { username: "2", password: "pass", start: "400", limit: "400" },
+
+  ];
+
+  for (const user of users) {
+    await delay(1000);
+    add_user(user.username, user.password, user.start, user.limit);
+  }
+}
+
+
+//fireFunctions();
+
+
+
+$(document).on("mousedown", function(e) {
+    pageX = e.pageX;
+    pageY = e.pageY;
+});
+
+document.addEventListener("mouseup", getSelectedText)
+document.addEventListener("mousedown", hidetooltip)
+
+function getSelectedText() {
+    var selection = null;
+    if (window.getSelection) {
+        selection = window.getSelection();
+    } else if (typeof document.selection != "undefined") {
+        selection = document.selection;
+    }
+    if (selection != '') {
+        selectedRange = selection.getRangeAt(0);
+        selectedRange = selectedRange.toString()
+        selectedRange=selectedRange.trim();
+        //console.log(selectedRange);
+        $('ul.tools').css({
+            'left': pageX + 5,
+            'top': pageY - 55
+        }).fadeIn(200);
+    } else {
+        $('ul.tools').fadeOut(200);
+
+    }
+}
+
+function hidetooltip() {
+
+    $('ul.tools').fadeOut(200);
+}
+
+function mark_all(posNeg) {
+  // Assuming `selectedRange` and `progressJson` are defined somewhere in your code
+  
+  // Prompt the user to confirm marking all notes
+  const confirmation = confirm(`Are you sure you want to mark ALL notes with the phrase "${selectedRange}" as ${posNeg}?`);
+  
+  // If user confirms, then ask whether to include already annotated notes
+  if (confirmation) {
+   // const includeAnnotated = confirm(`Do you want to mark the notes already annotated (${progress_json.length}) also?`);
+    //console.log(includeAnnotated)
+     // updateProgressJson(selectedRange, posNeg, includeAnnotated);
+      updateProgressJson(selectedRange, posNeg, false);
+   
+  }
+}
+function updateProgressJson(string, val, includeAnnotated) {
+    // Create a set of current_empi values for faster lookup
+    let currentEmpis = new Set(progress_json.map(item => item.current_empi));
+    let itemsToAdd = []; // Array to store items that will be added if the user confirms
+    
+    // Loop through all empi values to find matches
+    for (let current_empi of empi) {
+        // Check if the current_empi is not already in progress_json or includeAnnotated is true
+        if (includeAnnotated || !currentEmpis.has(current_empi)) {
+            // Find the report with the current empi
+            let report = json.find(report => report.EMPI === current_empi);
+            if (report && report.Report_Text.includes(string)) {
+                // If string is found, add to itemsToAdd
+                itemsToAdd.push({current_empi, val});
+            }
+        }
+    }
+    
+     // Ask the user for final confirmation since the action is irreversible
+
+    const userConfirmation = confirm(`You are about to annotate ${itemsToAdd.length} notes containing "${string}" as ${val}. This action cannot be undone. Are you absolutely sure you want to proceed?`);
+    if (!userConfirmation) {
+        return; // Exit the function if the user didn't confirm
+    }
+     // If the user is absolutely sure, proceed with the marking
+    // Add items to progress_json
+    progress_json.push(...itemsToAdd);
+
+    if (sort_empi_according_to_annotations=="yes"){
+sort_empi_annotated_first()}
+
+  
+    if (use_empi_cf !== "yes") {
+        progress_json_changed = changeEmpi(progress_json);
+    } else {
+        progress_json_changed = progress_json;
+    }
+
+    progress_json_changed = progress_json_changed.reduce((acc, obj) => {
+        const idx = acc.findIndex(item => item.current_empi === obj.current_empi);
+        if (idx !== -1) {
+            acc[idx] = obj;
+        } else {
+            acc.push(obj);
+        }
+        return acc;
+    }, []);
+  progress_json=progress_json_changed
+    save_annotations();
+    
+    console.log(progress_json);
+    let left = empi.length - progress_json.length;
+	//save to cloudflare
+	save_mark_all(val,string)
+	
+    alert(`${itemsToAdd.length} notes were marked as ${val} as they contained ${string}. ${left} notes left to annotate!`);
+	
+		  //sort_empi_annotated_first()
+$('#myRange').attr('max', empi.length)
+slider.value = progress_json.length
+start_uw()
+scroll_to_top()
+}
+
+
+
+
+function sort_empi_annotated_first(){
+console.log ("Sorting empi according to annotations...")
+let current_empi_set = new Set(progress_json.map(item => item.current_empi));
+
+// Sort the empi array
+empi.sort((a, b) => {
+  let aIsInSet = current_empi_set.has(a);
+  let bIsInSet = current_empi_set.has(b);
+
+  // If a is in the set but b is not, a should come first
+  if (aIsInSet && !bIsInSet) {
+    return -1;
+  }
+  
+  // If b is in the set but a is not, b should come first
+  if (!aIsInSet && bIsInSet) {
+    return 1;
+  }
+  
+  // If both or neither are in the set, don't change their order
+  return 0;
+});
+
+
+}
+
+
+
+async function save_phrases(pos_neg) {
+  
+  
+//if (parseInt(myRange.value)<=holdout_cutoff){
+//key_id=userName+'_'+pos_neg
+//console.log (key_id)
+//}
+//else {
+//key_id=userName+'_holdout_'+pos_neg
+//console.log (key_id)
+//}
+if ((current_empi >= 0 && current_empi <= 299) || (current_empi >= 1500 && current_empi <= 1799)) {
+key_id=userName+'_holdout_'+pos_neg
+  console.log (key_id)}
+  else {
+key_id=userName+'_'+pos_neg
+console.log (key_id)}
+
+
+  //const data = [userName, selectedRange];
+  //const data = [userName, selectedRange,pos_neg];
+  const data = [key_id, selectedRange];
+  const response = await fetch(url_save, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  const responseData = await response.json(); // Parse response as JSON
+  console.log(responseData); // Show response data in console
+}
+
+
+
+async function save_mark_all(pos_neg,string) {
+  
+
+key_id=userName+'_mark_all_'+pos_neg
+//key_id=userName.split('_')[0]+'_mark_all_'+pos_neg
+
+console.log (key_id)
+
+
+  const data = [key_id, string];
+  const response = await fetch(url_save, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  const responseData = await response.json(); // Parse response as JSON
+  console.log(responseData); // Show response data in console
+}
+
+
+
+
+async function save_matches(pos_neg,phrases) {
+key_id=userName+'_phrases_'+pos_neg
+
+  //const data = [userName, selectedRange];
+  //const data = [userName, selectedRange,pos_neg];
+  //const data = [key_id, phrases];
+    const data = [key_id, Array.from(phrases)]; // Convert set to array
+
+  const response = await fetch(url_save, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  const responseData = await response.json(); // Parse response as JSON
+  console.log(responseData); // Show response data in console
+}
+
+function getMarkSets() {
+  // Get all <mark> elements
+  const markElements = document.getElementsByTagName('mark');
+
+  // Create an object to store sets based on classes
+  const markSets = {
+    phrases_nidx_pos_set: new Set(),
+    phrases_nidx_neg_set: new Set(),
+    phrases_keywords_set: new Set(),
+    phrases_drugs_set: new Set()
+  };
+
+  // Loop through each <mark> element
+  for (let i = 0; i < markElements.length; i++) {
+    const markElement = markElements[i];
+
+    // Get the class of the <mark> element
+    const markClass = markElement.className;
+    if (markElement.innerText.length<=100){
+        // Add the innerText to the respective set based on the class
+        if (markClass === 'nidx') {
+          markSets.phrases_nidx_pos_set.add(markElement.innerText);
+        } else if (markClass === 'nidx_neg') {
+          markSets.phrases_nidx_neg_set.add(markElement.innerText);
+        } else if (markClass === 'pos') {
+          markSets.phrases_keywords_set.add(markElement.innerText);
+        } else if (markClass === 'drug') {
+          markSets.phrases_drugs_set.add(markElement.innerText);
+        }
+    }
+
+}
+
+  // Return the sets
+  return markSets;
+}
+
+
+function processMarkSets() {
+  const sets = getMarkSets();
+
+  for (const classType in sets) {
+  
+    const set = sets[classType];
+
+    // Check if the set is non-empty
+    if (set.size > 0) {
+		if (parseInt(myRange.value)<=holdout_cutoff){
+		console.log (name)
+		save_matches(classType, set);}
+		else {
+		name="holdout_"+classType
+		console.log (name)
+		save_matches(name, set);}
+
+
+//if ((current_empi >= 0 && current_empi <= 299) || (current_empi >= 1500 && current_empi <= 1799)) {
+//name="holdout_"+classType
+//		console.log (name)
+//		save_matches(name, set);}
+//  else {
+//console.log (name)
+//		save_matches(classType, set);}
+
+      
+    }
+  }
+}
+
+
+
+
+
+</script></body><html>

@@ -1,0 +1,72 @@
+Feature,Importance
+sdh_pos,4.207338069802719
+history_sdh,1.6930478241737685
+tentorium_pos,1.3293129948182991
+herniat_neg,1.3051684355704818
+hematoma_pos,1.29608750431324
+acut sdh_pos,1.2738427876073855
+ICD_852.2or3,1.2344785907177018
+ICD_I62.0,1.200787594108953
+intraparenchym hemorrhag_pos,1.049183710045306
+midlin shift_neg,0.9761099884669086
+midlin shift_pos,0.9158623514404728
+neurosurgeri_pos,0.8780466250140755
+stabl sdh_neg,0.7453657276193759
+herniat_pos,0.709580547243182
+ICD_432.1,0.642321266486525
+head ct_pos,0.5868024894389346
+CT,0.5863809303714966
+craniotomi_neg,0.5604330846534069
+intracrani hemorrhag_neg,0.5538007341315262
+mva_pos,0.534710640137555
+trauma_neg,0.5121301065670677
+intracrani hemorrhag_pos,0.4397797086155653
+burr hole_pos,0.3754069524411919
+brain injuri_pos,0.34649156337012543
+subdur_neg,0.33324141168118054
+thick_pos,0.3268024009932024
+tbi_pos,0.26952194137532187
+ICD_S06.5,0.26033881892997524
+neurosurg intervent_pos,0.25990574385959203
+mvc_pos,0.2477843971043489
+craniotomi_pos,0.2295403530178894
+head ct_neg,0.22522900027810533
+ct head_pos,0.20075173927910892
+neurosurgeri_neg,0.13976765574045527
+trauma_pos,0.12072175492075976
+scan_pos,0.040138294293797734
+subdur_pos,0.028005479077640626
+hematoma_neg,0.01030513991928429
+ct head_neg,0.00938032684381798
+drainag_pos,0.008926223298162278
+resolv sdh_neg,0.0
+recent sdh_neg,0.0
+prior sdh_neg,0.0
+mvc_neg,0.0
+thick_neg,0.0
+tentorium_neg,0.0
+tbi_neg,0.0
+known sdh_neg,0.0
+resolv sdh_pos,0.0
+mva_neg,0.0
+brain injuri_neg,0.0
+evacu_neg,0.0
+intraparenchym hemorrhag_neg,0.0
+acut sdh_neg,0.0
+brain mri_neg,0.0
+burr hole_neg,0.0
+craniectomi_neg,0.0
+chronic sdh_neg,0.0
+drainag_neg,-0.03724279419293185
+sdh_neg,-0.07336187317223528
+craniectomi_pos,-0.19295782172627426
+scan_neg,-0.3162990757376066
+brain mri_pos,-0.45799511554749994
+evacu_pos,-0.5743857369093258
+prior sdh_pos,-0.7279657704858542
+neurosurg intervent_neg,-0.7394920029622701
+recent sdh_pos,-0.7454028306528608
+stabl sdh_pos,-1.2471778440690318
+chronic sdh_pos,-1.2826599528481049
+known sdh_pos,-1.3592189460880684
+MRI,-1.390657356249195

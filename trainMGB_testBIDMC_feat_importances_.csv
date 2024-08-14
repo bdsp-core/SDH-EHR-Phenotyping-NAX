@@ -1,0 +1,72 @@
+Feature,Importance
+sdh_pos,3.4240354134695323
+brain injuri_pos,1.9251289051805394
+ICD_S06.5,1.499904850216273
+neurosurgeri_pos,1.3219782543331677
+midlin shift_pos,1.2172168061178315
+history_sdh,1.1253394675877757
+ICD_432.1,1.000444827598722
+scan_pos,0.9243687534269039
+acut sdh_pos,0.8666724076344062
+ct head_neg,0.8455335638184653
+stabl sdh_pos,0.8411659196223435
+MRI,0.8397207072294542
+herniat_pos,0.8186401127464006
+evacu_neg,0.716107496844323
+ICD_852.2or3,0.6899899047176248
+mvc_pos,0.5184547207534668
+trauma_neg,0.506851859627736
+craniotomi_neg,0.4934672976168264
+head ct_pos,0.480877083386328
+trauma_pos,0.47384227658439104
+ct head_pos,0.4677464891088909
+thick_pos,0.4597777482140465
+hematoma_neg,0.35342382868096295
+subdur_pos,0.31610437577707
+midlin shift_neg,0.25336995288516734
+sdh_neg,0.23414576021357264
+evacu_pos,0.21725802052214144
+neurosurg intervent_neg,0.20462871241044353
+drainag_pos,0.13286319014254205
+brain injuri_neg,0.09198680204088727
+chronic sdh_pos,0.07900529803149982
+tentorium_pos,0.07821827938267137
+hematoma_pos,0.07686071125314917
+prior sdh_pos,0.019706055935367107
+prior sdh_neg,0.0
+mva_neg,0.0
+intraparenchym hemorrhag_neg,0.0
+subdur_neg,0.0
+tbi_neg,0.0
+chronic sdh_neg,0.0
+tentorium_neg,0.0
+thick_neg,0.0
+neurosurg intervent_pos,0.0
+recent sdh_neg,0.0
+resolv sdh_neg,0.0
+craniectomi_neg,0.0
+stabl sdh_neg,0.0
+burr hole_neg,0.0
+brain mri_neg,0.0
+acut sdh_neg,0.0
+known sdh_neg,0.0
+mvc_neg,0.0
+burr hole_pos,-0.05530104840523038
+intracrani hemorrhag_pos,-0.06357321865253605
+head ct_neg,-0.18956903999350147
+scan_neg,-0.25291450798510207
+craniectomi_pos,-0.3475017132078654
+craniotomi_pos,-0.3985057869742564
+ICD_I62.0,-0.5091003857498207
+intraparenchym hemorrhag_pos,-0.5214234806518566
+CT,-0.5217622495842907
+brain mri_pos,-0.5661207864049032
+tbi_pos,-0.6222131627932206
+mva_pos,-0.64819474308523
+herniat_neg,-0.7514515968314759
+drainag_neg,-0.7766132644150978
+resolv sdh_pos,-0.9128388782094473
+neurosurgeri_neg,-1.0554345858319316
+known sdh_pos,-1.1203179675476194
+recent sdh_pos,-1.2135316438536385
+intracrani hemorrhag_neg,-1.48622198020142
