@@ -1,4 +1,4 @@
-#This tool can be used to inspect the notes of your data. Just swap out the file paths with the paths you have to use. 
+#This tool can be used to inspect the notes of your data. Please swap out the file paths with the paths you have to use. 
 import os
 import pandas as pd
 
@@ -22,12 +22,7 @@ def process_csv(group: bool, column1: str, column2: str, path: str = '.', file_n
         f.write(json_data)
         #f.write(';\nreset_empi_loaded_file1();')
 
-# True to group by PatientID, next is the
-# path to your csv file
-
-
+#Replace the path and file_name here:
 path = "/home/gregory178/Desktop/NAX project/NAX_SDH/Annotation_tool_training_error/"
 file_name = "false_negatives_with_notes.csv"
-# replace "note_id" with csv column with the unique id for each note and replace "note_txt" with the csv column containing the note text in the line below.
 process_csv(False, "BDSPPatientID", "NoteContent", path, file_name)
-#Unnamed: 0 usually
