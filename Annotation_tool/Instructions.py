@@ -8,7 +8,7 @@
 #6. Save all the files, and then open up the annotation tool "20240429_annotation tool_open source (1).html" on your computer.
 #7. Type in your username and password. 
 #8. Manually annotate all patient notes in the ICD+ group for MGB as positive or negative cases. 
-#9. Repeat steps 4-8, changing the file path each round from ICD+ MGB to ICD- MGB, to ICD+ BIDMC, to ICD- BIDMC. 
+#9. Repeat bullet points 4-8, changing the file path each round from ICD+ MGB to ICD- MGB, to ICD+ BIDMC, to ICD- BIDMC. 
 #10. Once all of the ICD + and ICD- files for both hospitals have been manually annotated, 
     #click inspect, console, and type in "(download_csv_progress_json)".
 #11. Once you have the csv containing all of your manual annotations for each patient, copy the file path of that file.
