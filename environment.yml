@@ -1,0 +1,19 @@
+name: sdh-ehr-phenotyping
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.8
+  - pandas=2.2.0
+  - numpy=1.26.4
+  - scipy=1.13.0
+  - scikit-learn=1.4.0
+  - matplotlib=3.8.2
+  - seaborn=0.13.2
+  - nltk=3.8.1
+  - jupyter>=1.0.0
+  - ipykernel>=6.0.0
+  - tqdm>=4.60.0
+  - pip
+  - pip:
+    - scikit-optimize>=0.9.0

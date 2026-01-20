@@ -1,6 +1,11 @@
-#This tool can be used to inspect the notes of your data. Please swap out the file paths with the paths you have to use. 
+#This tool can be used to inspect the notes of your data. Please swap out the file paths with the paths you have to use.
 import os
+import sys
 import pandas as pd
+
+# Add parent directory to path to import config
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import config
 
 def process_csv(group: bool, column1: str, column2: str, path: str = '.', file_name: str = ''):
     df = pd.read_csv(os.path.join(path, file_name), sep=',')
@@ -23,6 +28,7 @@ def process_csv(group: bool, column1: str, column2: str, path: str = '.', file_n
         #f.write(';\nreset_empi_loaded_file1();')
 
 #Replace the path and file_name here:
-path = "/home/gregory178/Desktop/NAX project/NAX_SDH/Annotation_tool_training_error/"
+# Use Annotation Tool directory from config or current directory
+path = str(config.ANNOTATION_TOOL_DIR) if hasattr(config, 'ANNOTATION_TOOL_DIR') else "."
 file_name = "false_negatives_with_notes.csv"
 process_csv(False, "BDSPPatientID", "NoteContent", path, file_name)

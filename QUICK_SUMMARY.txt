@@ -1,0 +1,265 @@
+================================================================================
+  SDH-EHR-PHENOTYPING-NAX: CODEBASE EXPLORATION SUMMARY
+================================================================================
+
+PROJECT: Acute Subdural Hematoma (aSDH) Detection from EHR Data
+PURPOSE: ML-based phenotyping using clinical notes, ICD codes, CPT codes
+FRAMEWORK: Jupyter Notebooks with scikit-learn ML models
+SCOPE: 26+ sequential analysis steps across two hospital systems
+
+================================================================================
+1. KEY STATISTICS
+================================================================================
+
+Repository Size:      284 files, ~600MB total
+Notebooks:           31 Jupyter notebooks
+Python Scripts:      2 (Annotation tool)
+Data Files:          200+ CSV + 30 pickle models
+Documentation:       README.md (good), but needs expansion
+Version Control:     Git initialized with 33 commits
+License:             MIT (2024, Brain Data Science Platform)
+
+================================================================================
+2. PROGRAMMING STACK
+================================================================================
+
+Language:            Python 3.x
+Main Framework:      Jupyter Notebooks
+Primary Libraries:   scikit-learn (73 uses), pandas (36), numpy (28)
+ML Models:           RandomForest, LogisticRegression
+Visualization:       matplotlib, seaborn
+Stats Testing:       scipy (DeLong test, etc.)
+Optimization:        scikit-optimize (Bayesian hyperparameter tuning)
+Text Processing:     NLTK, regex
+Data Handling:       pandas, tqdm, pickle
+
+All dependencies available in requirements.txt template provided.
+
+================================================================================
+3. CRITICAL ISSUES FOUND
+================================================================================
+
+ISSUE #1: HARDCODED FILESYSTEM PATHS
+  Severity: CRITICAL - Prevents reproducibility
+  Location: Multiple notebooks
+  Examples:
+    - /home/gregory178/Desktop/NAX project/NAX_SDH/
+    - Referenced in Step1, Optional_Step3-5, Annotation_tool/READ_ME.py
+  Impact: Notebooks cannot be run on any other machine
+  Solution: Create config.py with DATA_DIR variable
+
+ISSUE #2: PATIENT DATA IN PUBLIC REPO
+  Severity: CRITICAL - Privacy/compliance risk
+  Size: 37-44MB patient clinical notes CSVs
+  Data: De-identified patient notes, ICD codes, CPT codes, patient IDs
+  Impact: May violate HIPAA/IRB requirements
+  Solution: Remove from public repo, use GitHub LFS or separate data source
+
+ISSUE #3: MISSING REQUIREMENTS FILE
+  Severity: HIGH - Prevents setup
+  Impact: Users cannot install dependencies easily
+  Solution: Create requirements.txt (template provided)
+
+ISSUE #4: NO .gitignore FILE
+  Severity: HIGH - Repo hygiene
+  Impact: May accidentally commit sensitive files, OS artifacts
+  Solution: Create comprehensive .gitignore
+
+ISSUE #5: LARGE DATA FILES IN GIT
+  Severity: MEDIUM - Repository bloat
+  Impact: Slow clones, large downloads
+  Solution: Use .gitignore, GitHub LFS, or move to separate location
+
+================================================================================
+4. DIRECTORY STRUCTURE
+================================================================================
+
+Root Directory (284 files):
+├── README.md                              [Project overview - exists]
+├── LICENSE                                [MIT - exists]
+├── CODEBASE_ANALYSIS.md                   [Detailed analysis - new]
+├── CLEANUP_CHECKLIST.md                   [Action items - new]
+├── config.py                              [NEEDED - create]
+├── requirements.txt                       [NEEDED - create]
+├── .gitignore                             [NEEDED - create]
+│
+├── Annotation_tool/                       [Manual annotation UI]
+│   ├── READ_ME.py                        [HAS HARDCODED PATH]
+│   ├── Instructions.py
+│   ├── 20240429_annotation_tool_open_source.html
+│   ├── regexes.js                        [Keywords for highlighting]
+│   ├── css.css
+│   └── data.js                           [Generated from README.py]
+│
+├── Step1_Feature_Matrix.ipynb             [HAS 6+ HARDCODED PATHS]
+├── Step2_ICD_and_Feature_Matrix.ipynb
+├── Step3-26_*.ipynb                       [Main analysis workflow]
+├── Optional_Step1-5_*.ipynb               [Optional cohort generation - HAVE PATHS]
+├── delong_test_compare_AUC.ipynb          [Statistical comparison]
+│
+├── Data & Results/ (200+ files)
+│   ├── *sampling_cohort*.csv              [11-13MB - Patient data]
+│   ├── *Complete_Notes.csv                [11-37MB - Patient notes]
+│   ├── patientIDs_CPT_*.csv               [44MB - Patient CPT codes]
+│   ├── *_RF_model_train_*.pickle          [1-13MB each - Models]
+│   ├── *_LR_*.pickle                      [Logistic regression models]
+│   ├── *.png                              [60+ visualizations]
+│   └── various CSVs                       [Results, predictions, features]
+│
+├── .git/                                  [Version control]
+├── .claude/settings.local.json            [IDE settings - local only]
+└── hey.txt                                [Artifact - should delete]
+
+================================================================================
+5. WORKFLOW EXECUTION FLOW
+================================================================================
+
+DATA PREPARATION:
+  Step1 → Create feature matrix from clinical notes
+  Step2 → Add ICD codes + manual annotations
+
+TRAINING (Training Data):
+  Step3-4  → Hospital-specific logistic regression
+  Step5    → Combined logistic regression
+  Step6    → Error analysis
+  Step7-9  → Random Forest with 10-fold CV
+  Step13   → Demographics analysis
+  Step15-17 → Feature-specific models (ICD-only, CPT-only, KW-only)
+  Step23-25 → LR variants by feature type
+  Step26   → Format feature importances
+
+TESTING (Test Data):
+  Step10   → RF on both hospitals
+  Step11-12 → Hospital cross-validation
+  Step22   → Logistic regression testing
+
+ANALYSIS:
+  Step14   → False positive/negative analysis
+  Step18   → Generate comparison graphs
+  Step19-21 → Cohort reconstruction & error rates
+  delong_test_compare_AUC → Statistical testing
+
+OPTIONAL:
+  Optional_Step1-2 → Extract ICD cohorts
+  Optional_Step3-5 → Generate sampling cohorts
+
+NO SINGLE ENTRY POINT - Manual notebook execution required
+
+================================================================================
+6. DEPENDENCIES REFERENCE
+================================================================================
+
+Core ML Stack:
+  pandas>=1.3.0        (Data manipulation)
+  numpy>=1.20.0        (Numerical operations)
+  scikit-learn>=1.0.0  (ML models, cross-validation, preprocessing)
+
+Visualization:
+  matplotlib>=3.3.0    (Plotting)
+  seaborn>=0.11.0      (Statistical visualizations)
+
+Analysis:
+  scipy>=1.7.0         (Statistical tests)
+  scikit-optimize>=0.9.0 (Hyperparameter tuning)
+
+Text/Data Processing:
+  nltk>=3.6.0          (NLP, stemming)
+  tqdm>=4.60.0         (Progress bars)
+
+Serialization:
+  pickle               (Model saving/loading - stdlib)
+
+Non-standard:
+  thunderpack          (Data compression - investigate if needed)
+
+Full template in CLEANUP_CHECKLIST.md
+
+================================================================================
+7. WHAT'S WORKING WELL
+================================================================================
+
++ Complete documentation for 26+ steps in README.md
++ MIT License clearly defined
++ Comprehensive analysis pipeline implemented
++ Reproducible results (with path fixes)
++ Well-organized sequential workflow
++ Consistent data formatting across notebooks
++ Feature extraction methodology appears sound
++ Multiple validation approaches (CV, holdout tests)
++ Hospital cross-validation for generalization
++ Annotation tool provided for manual review
+
+================================================================================
+8. WHAT NEEDS FIXING BEFORE PUBLICATION
+================================================================================
+
+CRITICAL (Block publication):
+  - Remove/replace hardcoded paths (/home/gregory178/...)
+  - Address patient data privacy concerns
+  - Remove OS artifacts (.DS_Store)
+
+HIGH PRIORITY:
+  - Create requirements.txt
+  - Create .gitignore
+  - Create config.py for path management
+  - Remove duplicate notebooks
+  - Remove test files (hey.txt)
+
+MEDIUM PRIORITY:
+  - Add comprehensive documentation
+  - Consolidate repetitive code patterns
+  - Add docstrings and comments
+  - Create unit tests
+  - Add CI/CD workflows
+
+OPTIONAL (Polish):
+  - Docker support
+  - Package as Python module
+  - Add CONTRIBUTING.md
+  - Create developer documentation
+
+================================================================================
+9. ESTIMATED CLEANUP EFFORT
+================================================================================
+
+Priority 1 (Critical):       4-6 hours
+Priority 2 (High):           2-4 hours
+Priority 3 (Medium):         4-8 hours
+Priority 4 (Optional):       6-12 hours
+
+TOTAL FOR PUBLICATION:       2-3 weeks focused work
+
+================================================================================
+10. NEXT STEPS
+================================================================================
+
+1. Review CODEBASE_ANALYSIS.md for detailed findings (this document)
+2. Check CLEANUP_CHECKLIST.md for actionable items
+3. Address Priority 1 issues first (hardcoded paths, privacy)
+4. Test each fix locally before committing
+5. Use INSTALLATION.md template to verify setup works
+6. Test fresh clone to verify reproducibility
+
+================================================================================
+FILES PROVIDED
+================================================================================
+
+1. CODEBASE_ANALYSIS.md       - Full analysis (11 sections, >300 lines)
+2. CLEANUP_CHECKLIST.md        - Action items with priorities & effort estimates
+3. QUICK_SUMMARY.txt           - This file (quick reference)
+
+All files in: /Users/bwestove/cdac Dropbox/brandon westover/0_GithubRepos/SDH-EHR-Phenotyping-NAX/
+
+================================================================================
+CONTACT NOTES
+================================================================================
+
+Repository Author: Brain Data Science Platform (BDSP)
+Copyright: 2024
+Current Maintainer: (check git log)
+License: MIT
+
+For questions about hardcoded paths or design decisions, see git history
+or check the email address in annotations for BDSP contact.
+
+================================================================================

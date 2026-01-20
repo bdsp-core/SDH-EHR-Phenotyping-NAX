@@ -1,0 +1,97 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Data files - IMPORTANT: Large data files should not be in git
+# The data/ directory contains all CSV and model files
+# Uncomment the line below if you want to exclude ALL data from version control
+# data/
+
+# Alternatively, exclude specific file types from data directory
+data/*.csv
+data/*.pickle
+data/*.pkl
+
+# Keep the data directory structure and README
+!data/README.md
+!data/.gitkeep
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+hey.txt
+
+# Results directory - generated output files
+# Uncomment the line below if you don't want to track result files
+# results/
+
+# Alternatively, track the directory structure but not the files
+# results/*.png
+# results/*.pdf
+# results/*.csv
+# !results/README.md
+# !results/.gitkeep
+
+# Model files (optional - uncomment if models are too large)
+# RF_model_*.pickle
+# LR_model_*.pickle
+# model_train_*.pickle
+
+# Local configuration
+config.local.py
+.env.local
