@@ -88,6 +88,9 @@ The analysis pipeline consists of 26 steps organized into distinct phases:
 - **Step 25**: LR with keywords-only features
 - **Step 26**: Relabel feature importances for presentation
 
+### Phase 8: Tests during revision
+- **Step 27**: Compare performances
+
 ## Detailed Step Descriptions
 
 **Step 1 - Feature Matrix Creation**
@@ -166,7 +169,10 @@ Trains and tests logistic regression using only ICD code features on both hospit
 Trains and tests logistic regression using only keyword features on both hospitals.
 
 **Step 26 - Feature Importance Relabeling**
-Relabels feature importances from Step 10 for clearer presentation in figures.  
+Relabels feature importances from Step 10 for clearer presentation in figures. 
+
+**Step 27 - Compare Performances**
+Test if the slightly higher testing performance in Step10 is due to averaging 10 fold model probabilities ("ensemble").
 
 ## Optional Instructions for Making a New Sampling Cohort. These steps are not necessary to reproduce the data in this paper.
 If you want to make a new sampling cohort please read the following:  
